@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Discord Embed Generator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #36393f;
+            color: #ffffff;
+        }
+        .container {
+            background-color: #2f3136;
+            padding: 20px;
+            border-radius: 5px;
+        }
+        .field-group {
+            margin-bottom: 15px;
+            padding: 10px;
+            background-color: #40444b;
+            border-radius: 5px;
+        }
+        input, textarea, select {
+            width: 100%;
+            padding: 8px;
+            margin: 5px 0;
+            background-color: #40444b;
+            border: 1px solid #202225;
+            color: #ffffff;
+            border-radius: 3px;
+        }
+        button {
+            background-color: #7289da;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #677bc4;
+        }
+        #output {
+            background-color: #40444b;
+            padding: 15px;
+            border-radius: 5px;
+            white-space: pre-wrap;
+        }
+        .color-preview {
+            width: 30px;
+            height: 30px;
+            display: inline-block;
+            border: 1px solid #202225;
+            vertical-align: middle;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Discord Embed Generator for discordrb</h1>
+        
+        <div class="field-group">
+            <h3>Basic Settings</h3>
+            <input type="text" id="title" placeholder="Embed Title">
+            <textarea id="description" placeholder="Embed Description"></textarea>
+            <input type="color" id="color" value="#3498db">
+            <span class="color-preview" id="colorPreview"></span>
+        </div>
+
+        <div class="field-group">
+            <h3>Fields</h3>
+            <div id="fields"></div>
+            <button onclick="addField()">Add Field</button>
+        </div>
+
+        <div class="field-group">
+            <h3>Footer</h3>
+            <label>
+                <input type="checkbox" id="includeFooter"> Include Footer
+            </label>
+            <input type="text" id="footerText" placeholder="Footer Text">
+            <label>
+                <input type="checkbox" id="includeTimestamp"> Include Timestamp
+            </label>
+        </div>
+
+        <button onclick="generateCode()">Generate Code</button>
+
+        <h3>Output:</h3>
+        <div id="output"></div>
+    </div>
+
+    <script>
+        let fieldCount = 0;
+
+        function addField() {
+            const fieldsDiv = document.getElementById('fields');
+            const fieldDiv = document.createElement('div');
+            fieldDiv.className = 'field-group';
+            fieldDiv.innerHTML = `
+                <input type="text" placeholder="Field Name" class="field-name">
+                <textarea placeholder="Field Value" class="field-value"></textarea>
+                <label>
+                    <input type="checkbox" class="field-inline"> Inline
+                </label>
+                <button onclick="this.parentElement.remove()">Remove Field</button>
+            `;
+            fieldsDiv.appendChild(fieldDiv);
+            fieldCount++;
+        }
+
+        function generateCode() {
+            const title = document.getElementById('title').value;
+            const description = document.getElementById('description').value;
+            const color = document.getElementById('color').value;
+            const includeFooter = document.getElementById('includeFooter').checked;
+            const footerText = document.getElementById('footerText').value;
+            const includeTimestamp = document.getElementById('includeTimestamp').checked;
+
+            let fields = [];
+            document.querySelectorAll('#fields .field-group').forEach(fieldDiv => {
+                const name = fieldDiv.querySelector('.field-name').value;
+                const value = fieldDiv.querySelector('.field-value').value;
+                const inline = fieldDiv.querySelector('.field-inline').checked;
+                if (name && value) {
+                    fields.push({name, value, inline});
+                }
+            });
+
+            let code = 'response.embeds = [\n  {\n';
+            if (title) code += `    title: "${title}",\n`;
+            if (description) code += `    description: "${description}",\n`;
+            code += `    color: 0x${color.substring(1)},\n`;
+
+            if (fields.length > 0) {
+                code += '    fields: [\n';
+                fields.forEach((field, index) => {
+                    code += '      {\n';
+                    code += `        name: "${field.name}",\n`;
+                    code += `        value: "${field.value}",\n`;
+                    code += `        inline: ${field.inline}\n`;
+                    code += '      }' + (index < fields.length - 1 ? ',' : '') + '\n';
+                });
+                code += '    ],\n';
+            }
+
+            if (includeFooter) {
+                code += '    footer: {\n';
+                code += `      text: "${footerText}${includeTimestamp ? ' • #{Time.now.strftime(\'%d/%m/%Y às %H:%M:%S\')}' : ''}"\n`;
+                code += '    }\n';
+            }
+
+            code += '  }\n]';
+
+            document.getElementById('output').textContent = code;
+        }
+
+        // Update color preview
+        document.getElementById('color').addEventListener('input', function(e) {
+            document.getElementById('colorPreview').style.backgroundColor = e.target.value;
+        });
+
+        // Initialize color preview
+        document.getElementById('colorPreview').style.backgroundColor = document.getElementById('color').value;
+    </script>
+</body>
+</html>
