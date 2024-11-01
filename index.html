@@ -86,6 +86,21 @@
             border-radius: 4px;
             margin-left: 10px;
         }
+        .field {
+            margin-bottom: 10px;
+            padding: 10px;
+            background-color: #40444B;
+            border-radius: 4px;
+        }
+        .remove-btn {
+            background-color: #ED4245;
+            padding: 5px 10px;
+            font-size: 12px;
+            margin-top: 5px;
+        }
+        .remove-btn:hover {
+            background-color: #C03537;
+        }
     </style>
 </head>
 <body>
@@ -108,13 +123,7 @@
 
         <div class="field-group">
             <h3>Footer</h3>
-            <label>
-                <input type="checkbox" id="includeFooter"> Include Footer
-            </label>
             <input type="text" id="footerText" placeholder="Footer Text">
-            <label>
-                <input type="checkbox" id="includeTimestamp"> Include Timestamp
-            </label>
         </div>
 
         <button onclick="generateCode()">Generate Code</button>
@@ -126,34 +135,29 @@
     </div>
 
     <script>
-        let fieldCount = 0;
-
         function addField() {
             const fieldsDiv = document.getElementById('fields');
             const fieldDiv = document.createElement('div');
-            fieldDiv.className = 'field-group';
+            fieldDiv.className = 'field';
             fieldDiv.innerHTML = `
                 <input type="text" placeholder="Field Name" class="field-name">
                 <textarea placeholder="Field Value" class="field-value" rows="2"></textarea>
                 <label>
                     <input type="checkbox" class="field-inline"> Inline
                 </label>
-                <button onclick="this.parentElement.remove()">Remove Field</button>
+                <button class="remove-btn" onclick="this.parentElement.remove()">Remove Field</button>
             `;
             fieldsDiv.appendChild(fieldDiv);
-            fieldCount++;
         }
 
         function generateCode() {
             const title = document.getElementById('title').value;
             const description = document.getElementById('description').value;
             const color = document.getElementById('color').value;
-            const includeFooter = document.getElementById('includeFooter').checked;
             const footerText = document.getElementById('footerText').value;
-            const includeTimestamp = document.getElementById('includeTimestamp').checked;
 
             let fields = [];
-            document.querySelectorAll('#fields .field-group').forEach(fieldDiv => {
+            document.querySelectorAll('#fields .field').forEach(fieldDiv => {
                 const name = fieldDiv.querySelector('.field-name').value;
                 const value = fieldDiv.querySelector('.field-value').value;
                 const inline = fieldDiv.querySelector('.field-inline').checked;
@@ -179,9 +183,9 @@
                 code += '    ],\n';
             }
 
-            if (includeFooter) {
+            if (footerText) {
                 code += '    footer: {\n';
-                code += `      text: "${footerText}${includeTimestamp ? ' • #{Time.now.strftime(\'%d/%m/%Y às %H:%M:%S\')}' : ''}"\n`;
+                code += `      text: "${footerText}"\n`;
                 code += '    }\n';
             }
 
@@ -202,8 +206,8 @@
         }
 
         // Update color preview
-        document.getElementById('color ').addEventListener('input', function(e) {
-            document.getElementById('colorPreview').style.backgroundColor = e.target.value;
+        document.getElementById('color').addEventListener('input', function(e) {
+             document.getElementById('colorPreview').style.backgroundColor = e.target.value;
         });
 
         // Initialize color preview
