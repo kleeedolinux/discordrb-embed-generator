@@ -3,59 +3,88 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Discord Embed Generator</title>
+    <title>Discord Embed Generator for discordrb</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
     <style>
         body {
-            font-family: Arial, sans-serif;
-            max-width: 800px;
-            margin: 0 auto;
+            font-family: 'Roboto', sans-serif;
+            background-color: #2C2F33;
+            color: #FFFFFF;
+            margin: 0;
             padding: 20px;
-            background-color: #36393f;
-            color: #ffffff;
+            line-height: 1.6;
         }
         .container {
-            background-color: #2f3136;
-            padding: 20px;
-            border-radius: 5px;
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: #23272A;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        h1, h3 {
+            color: #7289DA;
         }
         .field-group {
-            margin-bottom: 15px;
-            padding: 10px;
-            background-color: #40444b;
-            border-radius: 5px;
+            background-color: #2C2F33;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
         }
         input, textarea, select {
             width: 100%;
-            padding: 8px;
-            margin: 5px 0;
-            background-color: #40444b;
-            border: 1px solid #202225;
-            color: #ffffff;
-            border-radius: 3px;
+            padding: 10px;
+            margin: 8px 0;
+            background-color: #40444B;
+            border: 1px solid #4F545C;
+            color: #FFFFFF;
+            border-radius: 4px;
+            font-size: 14px;
         }
         button {
-            background-color: #7289da;
+            background-color: #7289DA;
             color: white;
             padding: 10px 20px;
             border: none;
-            border-radius: 3px;
+            border-radius: 4px;
             cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
         }
         button:hover {
-            background-color: #677bc4;
+            background-color: #5B6EAE;
         }
         #output {
-            background-color: #40444b;
-            padding: 15px;
-            border-radius: 5px;
+            background-color: #40444B;
+            padding: 20px;
+            border-radius: 8px;
             white-space: pre-wrap;
+            font-family: 'Courier New', Courier, monospace;
+            position: relative;
+        }
+        .copy-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: #7289DA;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 5px 10px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .copy-btn:hover {
+            background-color: #5B6EAE;
         }
         .color-preview {
             width: 30px;
             height: 30px;
             display: inline-block;
-            border: 1px solid #202225;
+            border: 1px solid #4F545C;
             vertical-align: middle;
+            border-radius: 4px;
+            margin-left: 10px;
         }
     </style>
 </head>
@@ -66,8 +95,8 @@
         <div class="field-group">
             <h3>Basic Settings</h3>
             <input type="text" id="title" placeholder="Embed Title">
-            <textarea id="description" placeholder="Embed Description"></textarea>
-            <input type="color" id="color" value="#3498db">
+            <textarea id="description" placeholder="Embed Description" rows="3"></textarea>
+            <input type="color" id="color" value="#7289DA">
             <span class="color-preview" id="colorPreview"></span>
         </div>
 
@@ -91,7 +120,9 @@
         <button onclick="generateCode()">Generate Code</button>
 
         <h3>Output:</h3>
-        <div id="output"></div>
+        <div id="output">
+            <button class="copy-btn" onclick="copyCode()">Copy</button>
+        </div>
     </div>
 
     <script>
@@ -103,7 +134,7 @@
             fieldDiv.className = 'field-group';
             fieldDiv.innerHTML = `
                 <input type="text" placeholder="Field Name" class="field-name">
-                <textarea placeholder="Field Value" class="field-value"></textarea>
+                <textarea placeholder="Field Value" class="field-value" rows="2"></textarea>
                 <label>
                     <input type="checkbox" class="field-inline"> Inline
                 </label>
@@ -156,11 +187,22 @@
 
             code += '  }\n]';
 
-            document.getElementById('output').textContent = code;
+            document.getElementById('output').innerHTML = `<button class="copy-btn" onclick="copyCode()">Copy</button><pre>${code}</pre>`;
+        }
+
+        function copyCode() {
+            const codeElement = document.querySelector('#output pre');
+            const range = document.createRange();
+            range.selectNode(codeElement);
+            window.getSelection().removeAllRanges();
+            window.getSelection().addRange(range);
+            document.execCommand('copy');
+            window.getSelection().removeAllRanges();
+            alert('Code copied to clipboard!');
         }
 
         // Update color preview
-        document.getElementById('color').addEventListener('input', function(e) {
+        document.getElementById('color ').addEventListener('input', function(e) {
             document.getElementById('colorPreview').style.backgroundColor = e.target.value;
         });
 
